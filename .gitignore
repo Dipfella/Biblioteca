@@ -128,3 +128,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Ignorar archivos temporales de Visual Studio
+.vs/
+*.user
+*.suo
+
+# Ignorar carpetas de compilación
+bin/
+obj/
