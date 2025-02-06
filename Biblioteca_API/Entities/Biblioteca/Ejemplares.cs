@@ -11,7 +11,7 @@ namespace Biblioteca_API.Entities.Biblioteca
         public int Id { get; set; }
 
         [Column("LibroId")]
-        public int Titulo { get; set; }
+        public int LibroId { get; set; }
 
         [Column("CodigoInventario")]
         public string CodigoInventario { get; set; } = null!;

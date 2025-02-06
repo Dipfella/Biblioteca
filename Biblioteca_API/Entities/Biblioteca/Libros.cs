@@ -18,5 +18,9 @@ namespace Biblioteca_API.Entities.Biblioteca
 
         [Column("Genero")]
         public string Genero { get; set; } = null!;
+
+        [Column("PortadaUrl")]
+        public string? PortadaUrl { get; set; }
+
     }
 }
