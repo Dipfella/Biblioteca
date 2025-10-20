@@ -4,7 +4,7 @@ using static Biblioteca_API.Models.Libros;
 
 namespace Biblioteca_API.Features.Libros.Querys
 {
-    public class GetLibrosListQuery : IRequest<List<Entities.Biblioteca.Libros>>
+    public class GetLibrosListQuery : IRequest<List<LibrosResponse>>
     {
         public string? Titulo { get; set; }
         public string? Autor { get; set; }

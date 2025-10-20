@@ -5,6 +5,7 @@ using Biblioteca_API.Features.Libros.Querys;
 using Biblioteca_API.Features.Libros.Commands;
 using Microsoft.AspNetCore.Components.Forms;
 using Newtonsoft.Json;
+using static Biblioteca_API.Models.Libros;
 
 namespace Biblioteca_API.Features.Libros
 {
@@ -20,7 +21,7 @@ namespace Biblioteca_API.Features.Libros
         }
 
         [HttpGet]
-        public async Task<List<Entities.Biblioteca.Libros>> GetLibroList(string? genero, string? autor, string? titulo, long cantidadRegistros)
+        public async Task<List<LibrosResponse>> GetLibroList(string? genero, string? autor, string? titulo, long cantidadRegistros)
         {
             var objeto = await _mediator.Send(new GetLibrosListQuery() { Genero = genero, Autor = autor, Titulo = titulo, CantidadRegistros = cantidadRegistros });
             return objeto;

@@ -1,1 +1,125 @@
-<p>lista-libros works!</p>
+<div class="flex justify-center bg-background min-h-screen">
+    <div class="w-full max-w-7xl p-8">
+        <!-- Título -->
+        <h1 class="text-3xl font-semibold mb-8 text-emerald-800 text-center">
+            Gestión de préstamos
+            <div class="border-b border-emerald-800 w-auto mt-4"></div>
+        </h1>
+        <!--Filtros-->
+        <span class="font-medium text-lg flex mb-4 pl-4">Filtros de búsqueda</span>
+        <div class="flex flex-wrap items-start mb-5 gap-6 md:gap-8 w-full max-w-7xl mx-auto pb-5 px-4">
+
+            <div class="flex flex-col flex-1 min-w-[200px]">
+                <label for="nombre" class="mb-2 text-gray-700 font-medium">Nombre del libro</label>
+                <select id="nombre" name="titulo" [(ngModel)]="model.titulo"
+                    class="w-full bg-transparent border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Seleccione un nombre</option>
+                    <option *ngFor="let l of nombresLibros" [value]="l.titulo">{{ l.titulo }}</option>
+                </select>
+            </div>
+            <div class="flex flex-col flex-1 min-w-[200px]">
+                <label for="autor" class="mb-2 text-gray-700 font-medium">Autor</label>
+                <select id="autor" name="autor" [(ngModel)]="model.autor"
+                    class="w-full bg-transparent border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Seleccione un Autor</option>
+                    <option *ngFor="let a of autoresLibros" [value]="a.autor">{{ a.autor }}</option>
+                </select>
+            </div>
+            <div class="flex flex-col flex-1 min-w-[200px]">
+                <label for="genero" class="mb-2 text-gray-700 font-medium">Género</label>
+                <select id="genero" name="genero" [(ngModel)]="model.genero"
+                    class="w-full bg-transparent border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Seleccione un Género</option>
+                    <option *ngFor="let g of generosLibros" [value]="g.genero">{{ g.genero }}</option>
+                </select>
+            </div>
+            <div class="flex flex-col flex-1 min-w-[200px]">
+                <label for="editorial" class="mb-2 text-gray-700 font-medium">Disponibilidad</label>
+                <select id="genero"
+                    class="w-full bg-transparent border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Seleccione la Disponibilidad</option>
+                    <option value="1">Disponible</option>
+                    <option value="0">No Disponible</option>
+                </select>
+            </div>
+            <div class="w-full flex gap-4">
+                <button class="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition"
+                    (click)="getLibros()">Buscar</button>
+                <button class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
+                    (click)="model = { id:0, titulo:'', autor:'', genero:'', portadaUrl:'' }; getLibros()">Limpiar</button>
+            </div>
+        </div>
+        <div class="border-b border-gray-300 w-auto mt-4"></div>
+
+        <!-- Grid de libros -->
+        <div class="flex items-center justify-between mt-6">
+            <div>
+                <span class="font-medium text-lg">Lista de libros</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="mr-5 text-sm">{{librosSeleccionados.length}} de 4 libros seleccionados</span>
+
+                <button [disabled]="librosSeleccionados.length === 0" [ngClass]="{
+                    'bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer': librosSeleccionados.length > 0,
+                    'bg-gray-300 text-gray-500 cursor-not-allowed': librosSeleccionados.length === 0 || librosSeleccionados.length > 4
+                    }" class="px-4 py-2 rounded-md transition" (click)="this.generarPrestamo()">
+                    Generar préstamo
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid de libros -->
+        <div *ngIf="!loading && libros.length"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 mt-[30px]">
+
+            <div *ngFor="let libro of libros" (click)="toggleSeleccion(libro)" [ngClass]="{
+         'border-emerald-500': estaSeleccionado(libro),
+         'border-emerald-100': !estaSeleccionado(libro),
+         'cursor-not-allowed bg-gray-300': esNoDisponible(libro)
+       }" class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border w-full max-w-[220px] cursor-pointer">
+
+                <img [src]="libro.portadaUrl.startsWith('http') ? libro.portadaUrl : environment.apiUrl + libro.portadaUrl"
+                    alt="Portada de {{ libro.titulo }}"
+                    class="w-full h-64 object-cover rounded-t-2xl transition duration-300"
+                    [ngClass]="{'filter grayscale': esNoDisponible(libro)}" (error)="onImageError($event)" />
+
+                <div class="p-4">
+                    <h3 class="font-semibold text-emerald-800 truncate text-lg">{{ libro.titulo }}</h3>
+                    <p class="text-sm text-gray-700 font-medium">{{ libro.autor }}</p>
+                    <div class="flex justify-between">
+                        <p class="text-xs text-gray-500 mt-1 italic">{{ libro.genero }}</p>
+                        <p *ngIf="esNoDisponible(libro)" class="text-red-600 font-semibold mt-1 text-xs">No disponible
+                        </p>
+                        <p *ngIf="!esNoDisponible(libro)" class="text-green-600 font-semibold mt-1 text-xs">Disponible
+                        </p>
+                    </div>
+                    <!-- EJEMPLARES DISPONIBLES DENTRO DE LA CARD -->
+                    <div class="mt-3 h-[3rem]">
+                        <div *ngIf="librosExtendidos[libro.id]">
+                            <!-- Texto encima -->
+                            <span class="text-xs font-medium mb-2 block">Seleccione un ejemplar:</span>
+                            <!-- Botones de ejemplares -->
+                            <div class="flex flex-wrap gap-2">
+                                <button *ngFor="let ejemplar of getEjemplaresDisponibles(libro)"
+                                    (click)="$event.stopPropagation(); toggleEjemplar(libro.id, ejemplar)" [ngClass]="{
+              'bg-emerald-500 text-white': estaSeleccionadoEjemplar(libro.id, ejemplar),
+              'bg-white border border-emerald-500 text-gray-800': !estaSeleccionadoEjemplar(libro.id, ejemplar)
+            }" class="px-2 py-1 rounded-md hover:bg-emerald-500 hover:text-white transition text-xs">
+                                    {{ ejemplar.codigoInventario }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Loader -->
+        <div *ngIf="loading" class="text-emerald-600 text-center animate-pulse">
+            Cargando libros...
+        </div>
+        <!-- Sin libros -->
+        <div *ngIf="!loading && !libros.length" class="text-gray-600 mt-10 text-center">
+            No hay libros registrados.
+        </div>
+    </div>
+</div>
